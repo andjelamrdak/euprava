@@ -6,6 +6,10 @@ import * as fs from 'fs';
 import * as https from 'https';
 import { appDataSource } from "./dataSource";
 
+import authentificationRouter from './route/authentificationRouter'
+import userRouter from './route/userRouter'
+
+
 appDataSource.initialize().then(async connection => {
     const key = fs.readFileSync('./key.pem', 'utf8');
     const cert = fs.readFileSync('./cert.pem', 'utf8');
@@ -29,13 +33,16 @@ appDataSource.initialize().then(async connection => {
         }
     }))
 
+    app.use('/auth', authentificationRouter)
+    app.use('/user', userRouter);
+
     const server = https.createServer({
         key: key,
         cert: cert,
     }, app)
 
     server.listen(8000, () => {
-        console.log('Server is listening')
+        console.log('Server is listening');
     })
 
 }).catch(error => console.log(error));
