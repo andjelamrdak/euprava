@@ -8,6 +8,7 @@ import { appDataSource } from "./dataSource";
 
 import authentificationRouter from './route/authentificationRouter'
 import userRouter from './route/userRouter'
+import adminRouter from './route/adminRouter'
 
 
 appDataSource.initialize().then(async connection => {
@@ -33,6 +34,7 @@ appDataSource.initialize().then(async connection => {
         }
     }))
 
+    app.use('/admin', adminRouter);
     app.use('/auth', authentificationRouter)
     app.use('/user', userRouter);
 
