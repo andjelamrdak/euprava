@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { Button, Form, Message, Schema, toaster, Uploader } from "rsuite";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Button, Checkbox, Form, Message, Schema, toaster } from "rsuite";
+import ModalWrap from "../commons/ModalWrap";
 
 const model = Schema.Model({
   email: Schema.Types.StringType().isRequired().isEmail(),
@@ -12,24 +13,31 @@ const model = Schema.Model({
     .addRule((v, d) => v === d.password, "Passwords are not the same", true),
 });
 
-export default function Register(props) {
-  const [formValue, setFormValue] = useState({});
+function EditUser({ open, handleClose, modalData }) {
+
+  const [formValue, setFormValue] = useState(modalData);
+
+  useEffect(() => {
+    setFormValue(modalData);
+  }, [modalData])
+
+  const changeProp = async (user) => {
+    await axios.patch("/admin/user/" + user.id, { ...formValue });
+  };
+
   return (
-    <div>
-      <h2>Register</h2>
+    <ModalWrap showFooter={false} title="Izmeni korisnika" open={open} handleClose={handleClose}>
       <Form
         fluid
         model={model}
         formValue={formValue}
         checkTrigger="none"
         onChange={setFormValue}
-        onSubmit={async (c) => {
-          if (!c) {
-            return;
-          }
+        onSubmit={async () => {
           try {
-            await props.onSubmit(formValue);
+            await changeProp(modalData);
             setFormValue({});
+            handleClose();
           } catch (error) {
             console.log(error);
             toaster.push(<Message type="error">{error?.response.data.error}</Message>);
@@ -51,25 +59,24 @@ export default function Register(props) {
           <Form.ControlLabel>JMBG</Form.ControlLabel>
           <Form.Control name="jmbg" />
         </Form.Group>
-        <Form.Group controlId="password">
-          <Form.ControlLabel>Password</Form.ControlLabel>
-          <Form.Control type="password" name="password" />
+        <Form.Group controlId="blocked">
+          <Form.ControlLabel>Blokiran</Form.ControlLabel>
+          <Form.Control accepter={Checkbox} name="blocked" />
         </Form.Group>
-        <Form.Group controlId="repeat">
-          <Form.ControlLabel>Repeat</Form.ControlLabel>
-          <Form.Control type="password" name="repeat" />
+        <Form.Group controlId="admin">
+          <Form.ControlLabel>Admin</Form.ControlLabel>
+          <Form.Control accepter={Checkbox} name="admin" />
+        </Form.Group>
+        <Form.Group controlId="idCardNumber">
+          <Form.ControlLabel>idCardNumber</Form.ControlLabel>
+          <Form.Control name="idCardNumber" />
         </Form.Group>
         <Button className="fluid" type="submit" appearance="primary">
-          Register
+          Update
         </Button>
       </Form>
-      {props.showLoginLink && (
-        <Link to="/">
-          <Button className="fluid" appearance="link">
-            Already have an acount
-          </Button>
-        </Link>
-      )}
-    </div>
+    </ModalWrap>
   );
 }
+
+export default EditUser;

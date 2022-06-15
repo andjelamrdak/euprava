@@ -8,7 +8,6 @@ function Card(props) {
   const [modal, setModal] = useState(null);
 
   const changeProp =  async (user, propName) => {
-      console.log('aaa')
     await axios.patch('/admin/user/' + user.id, { [propName]: !user[propName] });
   }
 

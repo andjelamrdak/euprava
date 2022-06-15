@@ -54,7 +54,7 @@ function App() {
           <FlexboxGrid.Item colspan={8}>
             <BrowserRouter>
               <Routes>
-                <Route path='/register' element={<Register onSubmit={register} />} />
+                <Route path='/register' element={<Register showLoginLink onSubmit={register} />} />
                 <Route path='*' element={<Login onSubmit={login} />} />
               </Routes>
             </BrowserRouter>

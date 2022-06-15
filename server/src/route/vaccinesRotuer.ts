@@ -19,11 +19,10 @@ router.get("/", async (_req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const user = (req.session as any).user as User;
-
   const post = await appDataSource.getRepository(Vaccine).save({
-    ...req.body,
-    user,
+    userId: req.body.userId,
+    disease: req.body.disease,
+    dateOfVaccintaion: req.body.dateOfVaccintaion
   });
   res.json(post);
 });

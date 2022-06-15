@@ -15,7 +15,7 @@ export class CriminalProceeding {
   @Column({ nullable: false })
   accusation: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   judgment: string;
 
   @Column({ default: false })

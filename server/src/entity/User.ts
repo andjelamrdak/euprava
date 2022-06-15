@@ -1,6 +1,8 @@
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { EncryptionTransformer } from "typeorm-encrypted";
 import { IdCard } from "./IdCard";
+import { Vaccine } from './Vaccine';
+import { CriminalProceeding } from './CriminalProceeding';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -32,11 +34,11 @@ export class User {
   @Column({ default: false })
   blocked: boolean;
 
-  @Column({ nullable: false })
-  jmbg: number;
+  @Column({ nullable: false, type: `bigint` })
+  jmbg: string;
 
-  @Column({ nullable: false })
-  idCardNumber: number;
+  @Column({ nullable: true, type: `bigint` })
+  idCardNumber: string;
 
   @Column({ nullable: true })
   address: string;
@@ -44,15 +46,12 @@ export class User {
   @Column({ nullable: true })
   city: string;
 
-  @Column({ nullable: true })
-  imageUrl: string | undefined;
-
   @OneToMany(() => IdCard, (p) => p.user)
   idCards: IdCard[];
 
-  @OneToMany(() => IdCard, (p) => p.user)
-  vaccines: IdCard[];
+  @OneToMany(() => Vaccine, (p) => p.user)
+  vaccines: Vaccine[];
 
-  @OneToMany(() => IdCard, (p) => p.user)
+  @OneToMany(() => CriminalProceeding, (p) => p.user)
   criminalProceedings: IdCard[];
 }

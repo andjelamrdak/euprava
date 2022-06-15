@@ -22,6 +22,12 @@ export class IdCard {
   @Column()
   dateOfIssue: Date;
 
+  @Column()
+  city: string;
+
+  @Column()
+  address: string;
+
   @Column({ default: false })
   lostOrStolen: boolean;
 }
