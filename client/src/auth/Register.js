@@ -16,7 +16,11 @@ export default function Register(props) {
   const [formValue, setFormValue] = useState({});
   return (
     <div>
-      <h2>Register</h2>
+      {
+        props.showLoginLink && (
+          <h2>Register</h2>
+        )
+      }
       <Form
         fluid
         model={model}

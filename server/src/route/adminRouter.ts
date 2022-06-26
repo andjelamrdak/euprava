@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { appDataSource } from "../dataSource";
 import { User } from "../entity/User";
+import { Vaccine } from "../entity/Vaccine";
 import isAdminMiddleware from "../middleware/adminMiddleware";
 
 const router = Router();
@@ -43,5 +44,18 @@ router.post("/add-user", async (req, res) => {
     res.status(400).json({ error: "User already exists" + error });
   }
 });
+
+router.get('/vaccine-data', async (req, res) => {
+  const result = await appDataSource.getRepository(User)
+    .createQueryBuilder('user')
+    .select('user.id', 'userId')
+    .addSelect(`CONCAT(user.firstName,' ', user.lastName)`, 'userName')
+    .addSelect('COUNT(vaccine.id)', 'total')
+    .leftJoin(Vaccine, 'vaccine', 'user.id = vaccine.userId')
+    .groupBy('user.id')
+    .getRawMany();
+
+  res.json(result);
+})
 
 export default router;

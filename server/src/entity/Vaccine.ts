@@ -6,10 +6,10 @@ export class Vaccine {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({nullable: false})
+  @Column({ nullable: false })
   dateOfVaccintaion: Date;
 
-  @Column({nullable: false})
+  @Column({ nullable: false })
   disease: string;
 
   @Column()

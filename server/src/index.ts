@@ -11,6 +11,8 @@ import userRouter from './route/userRouter'
 import adminRouter from './route/adminRouter'
 import vaccinesRouter from './route/vaccinesRotuer'
 import criminalProceeding from './route/criminalProceeding'
+import idCardsRouter from './route/idCardsRouter';
+import { User } from "./entity/User";
 
 
 appDataSource.initialize().then(async connection => {
@@ -18,6 +20,7 @@ appDataSource.initialize().then(async connection => {
     const cert = fs.readFileSync('./cert.pem', 'utf8');
     // create express app
     const app = express();
+
     app.use(express.json());
     app.use(cors({
         origin: 'http://localhost:3000',
@@ -35,33 +38,22 @@ appDataSource.initialize().then(async connection => {
             secure: true
         }
     }))
+    app.use('/auth', authentificationRouter)
 
-    // app.post('/upload', uplaodMiddleware, renameFile('img'), (req, res) => {
-    //     res.json({
-    //         fileUrl: (req as any).fileUrl
-    //     })
-    // })
-    // app.use('/img', express.static('img', {
-    //     extensions: ['png', 'jpg', 'jpeg']
-    // }))
-    // app.use((request, response, next) => {
-        //     const user = (request.session as any).user as User | undefined;
-        //     if (!user || user.blocked) {
-            //         response.status(401).json({ error: 'Unauthorized' })
-    //         return;
-    //     }
-    //     next();
-    // });
+    app.use((request, response, next) => {
+        const user = (request.session as any).user as User | undefined;
+        if (!user || user.blocked) {
+            response.status(401).json({ error: 'Unauthorized' })
+            return;
+        }
+        next();
+    });
 
-    // app.use('/post', postRouter);
-    // app.use('/post-category', postCategoryRouter);
-    // app.use('/message', messageRouter);
     app.use('/vaccines', vaccinesRouter);
     app.use('/admin', adminRouter);
-    app.use('/auth', authentificationRouter)
     app.use('/user', userRouter);
     app.use('/criminalProceeding', criminalProceeding);
-
+    app.use('/id-card', idCardsRouter)
     const server = https.createServer({
         key: key,
         cert: cert,

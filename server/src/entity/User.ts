@@ -53,5 +53,5 @@ export class User {
   vaccines: Vaccine[];
 
   @OneToMany(() => CriminalProceeding, (p) => p.user)
-  criminalProceedings: IdCard[];
+  criminalProceedings: CriminalProceeding[];
 }

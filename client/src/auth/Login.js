@@ -8,7 +8,7 @@ const model = Schema.Model({
 });
 
 export default function Login(props) {
-  const [formValue, setFormValue] = useState({});
+  const [formValue, setFormValue] = useState({ email: '', password: '' });
   return (
     <div>
       <h2>Login</h2>

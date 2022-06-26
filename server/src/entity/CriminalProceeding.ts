@@ -1,5 +1,4 @@
-import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
-import { EncryptionTransformer } from "typeorm-encrypted";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './User';
 @Entity()
 export class CriminalProceeding {
@@ -12,7 +11,7 @@ export class CriminalProceeding {
   @Column({ nullable: true })
   endDate: Date;
 
-  @Column({ nullable: false })
+  @Column()
   accusation: string;
 
   @Column({ nullable: true })
@@ -21,7 +20,7 @@ export class CriminalProceeding {
   @Column({ default: false })
   convicted: boolean;
 
-  @Column({ default: false })
+  @Column()
   severity: number;
 
   @Column()

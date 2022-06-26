@@ -19,7 +19,7 @@ export default function AdminNavbar(props) {
         <Nav.Item as={NavLink} to="/">
           <AdminIcon />
         </Nav.Item>
-        <Nav.Item onClick={props.onLogout} as={Button} to="/statistics">
+        <Nav.Item onClick={props.onLogout} as={Button}>
           Logout
         </Nav.Item>
       </Nav>

@@ -1,20 +1,29 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Button, Checkbox, DatePicker, Form, InputNumber, Message, Schema, toaster } from "rsuite";
+import { Button, Checkbox, CheckboxGroup, DatePicker, Form, InputNumber, Message, Schema, toaster } from "rsuite";
 import ModalWrap from "../commons/ModalWrap";
 
-function CriminalProceedingModal({ open, handleClose, modalData, shouldUpdate }) {
+function CriminalProceedingModal({ open, handleClose, modalData, shouldUpdate, onSubmit }) {
   const [formValue, setFormValue] = useState(modalData);
 
   useEffect(() => {
-    setFormValue(modalData);
+    const flags = [];
+    if (modalData?.convicted) {
+      flags.push('convicted');
+    }
+    setFormValue({
+      ...modalData,
+      flags
+    });
   }, [modalData]);
 
   const createCriminalProceeding = async (user) => {
-    await axios.post("/criminalProceeding/", { ...formValue, userId: user.id });
+    const { flags, ...rest } = formValue;
+    await axios.post("/criminalProceeding/", { ...rest, convicted: (formValue.flags || []).includes('convicted'), userId: user.id });
   };
   const updateCriminalProceeding = async (user) => {
-    await axios.patch("/criminalProceeding/", { ...formValue, userId: user.id });
+    const { flags, ...rest } = formValue;
+    await axios.patch("/criminalProceeding/" + modalData.id, { ...rest, convicted: (formValue.flags || []).includes('convicted'), userId: modalData.userId });
   };
 
   return (
@@ -27,8 +36,9 @@ function CriminalProceedingModal({ open, handleClose, modalData, shouldUpdate })
         onSubmit={async () => {
           try {
 
-            if(shouldUpdate) {
-              updateCriminalProceeding(modalData);
+            if (shouldUpdate) {
+              await updateCriminalProceeding(modalData);
+              await onSubmit();
             } else {
               await createCriminalProceeding(modalData);
             }
@@ -39,21 +49,13 @@ function CriminalProceedingModal({ open, handleClose, modalData, shouldUpdate })
             toaster.push(<Message type="error">{error?.response.data.error}</Message>);
           }
         }}>
-        <Form.Group controlId="firstName">
-          <Form.ControlLabel>First name</Form.ControlLabel>
-          <Form.Control disabled name="firstName" />
-        </Form.Group>
-        <Form.Group controlId="lastName">
-          <Form.ControlLabel>Last name</Form.ControlLabel>
-          <Form.Control disabled name="lastName" />
-        </Form.Group>
         <Form.Group controlId="beginDate">
           <Form.ControlLabel>Begin Date</Form.ControlLabel>
-          <Form.Control accepter={DatePicker} name="beginDate" />
+          <Form.Control accepter={DatePicker} oneTap name="beginDate" />
         </Form.Group>
         <Form.Group controlId="endDate">
           <Form.ControlLabel>End Date</Form.ControlLabel>
-          <Form.Control accepter={DatePicker} name="endDate" />
+          <Form.Control accepter={DatePicker} oneTap name="endDate" />
         </Form.Group>
         <Form.Group controlId="accusation">
           <Form.ControlLabel>Accusation</Form.ControlLabel>
@@ -61,7 +63,9 @@ function CriminalProceedingModal({ open, handleClose, modalData, shouldUpdate })
         </Form.Group>
         <Form.Group controlId="convicted">
           <Form.ControlLabel>Convicted</Form.ControlLabel>
-          <Form.Control accepter={Checkbox} name="convicted" />
+          <Form.Control accepter={CheckboxGroup} name="flags">
+            <Checkbox value='convicted'>Convicted</Checkbox>
+          </Form.Control>
         </Form.Group>
         <Form.Group controlId="severity">
           <Form.ControlLabel>Severity</Form.ControlLabel>

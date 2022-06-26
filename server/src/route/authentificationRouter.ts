@@ -2,9 +2,6 @@ import axios from "axios";
 import { Router } from "express";
 import { appDataSource } from "../dataSource";
 import { User } from "../entity/User";
-import { v4 } from 'uuid'
-import * as fs from 'fs'
-import path = require("path");
 const router = Router();
 
 
@@ -37,8 +34,7 @@ router.post('/register', async (req, res) => {
   try {
     const user = await userRepository.save({
       ...req.body,
-      admin: false,
-      blocked: true
+      admin: false
     });
     (req.session as any).user = user;
     req.session.save(e => {

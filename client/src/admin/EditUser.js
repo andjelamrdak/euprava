@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Button, Checkbox, Form, Message, Schema, toaster } from "rsuite";
+import { Button, Checkbox, CheckboxGroup, Form, Message, Schema, toaster } from "rsuite";
 import ModalWrap from "../commons/ModalWrap";
 
 const model = Schema.Model({
@@ -13,16 +13,31 @@ const model = Schema.Model({
     .addRule((v, d) => v === d.password, "Passwords are not the same", true),
 });
 
-function EditUser({ open, handleClose, modalData }) {
+function EditUser({ open, handleClose, modalData, onSubmit }) {
 
   const [formValue, setFormValue] = useState(modalData);
 
   useEffect(() => {
-    setFormValue(modalData);
+    const flags = [];
+    if (modalData?.admin) {
+      flags.push('admin')
+    }
+    if (modalData?.blocked) {
+      flags.push('blocked')
+    }
+    setFormValue({
+      ...modalData,
+      flags
+    });
   }, [modalData])
 
   const changeProp = async (user) => {
-    await axios.patch("/admin/user/" + user.id, { ...formValue });
+    const { flags, ...rest } = formValue;
+    await axios.patch("/admin/user/" + user.id, {
+      ...rest,
+      admin: (formValue.flags || []).includes('admin'),
+      blocked: (formValue.flags || []).includes('blocked')
+    });
   };
 
   return (
@@ -38,6 +53,7 @@ function EditUser({ open, handleClose, modalData }) {
             await changeProp(modalData);
             setFormValue({});
             handleClose();
+            onSubmit();
           } catch (error) {
             console.log(error);
             toaster.push(<Message type="error">{error?.response.data.error}</Message>);
@@ -59,13 +75,12 @@ function EditUser({ open, handleClose, modalData }) {
           <Form.ControlLabel>JMBG</Form.ControlLabel>
           <Form.Control name="jmbg" />
         </Form.Group>
-        <Form.Group controlId="blocked">
-          <Form.ControlLabel>Blokiran</Form.ControlLabel>
-          <Form.Control accepter={Checkbox} name="blocked" />
-        </Form.Group>
-        <Form.Group controlId="admin">
-          <Form.ControlLabel>Admin</Form.ControlLabel>
-          <Form.Control accepter={Checkbox} name="admin" />
+        <Form.Group >
+          <Form.ControlLabel>Statusi</Form.ControlLabel>
+          <Form.Control accepter={CheckboxGroup} name="flags">
+            <Checkbox value="admin">Admin</Checkbox>
+            <Checkbox value="blocked">Blocked</Checkbox>
+          </Form.Control>
         </Form.Group>
         <Form.Group controlId="idCardNumber">
           <Form.ControlLabel>idCardNumber</Form.ControlLabel>

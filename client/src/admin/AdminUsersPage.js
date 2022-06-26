@@ -7,6 +7,7 @@ import VaccineModal from "./VaccineModal";
 import { useNavigate } from "react-router-dom";
 import CriminalProceedingModal from "./CriminalProceedingModal";
 import NewUserModal from "./NewUserModal";
+import IdCardModal from "./IdCardModal";
 
 function AdminUsersPage() {
   const basicColumns = [
@@ -59,6 +60,10 @@ function AdminUsersPage() {
       onclick: (e) => setVaccineModal(e),
     },
     {
+      render: () => "Dodaj licnu kartu",
+      onclick: (e) => setCardIdModal(e),
+    },
+    {
       render: () => "Dodaj u kazneni registar",
       onclick: (e) => setCriminal(e),
     },
@@ -70,14 +75,14 @@ function AdminUsersPage() {
   const [vaccineModal, setVaccineModal] = useState(null);
   const [criminal, setCriminal] = useState(null);
   const [newUserModal, setNewUserModal] = useState(null);
-
+  const [cardIdModal, setCardIdModal] = useState(null)
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
 
-  const getUsers = async (u) => {
-    const res = await axios.get(`/user?search=${search}&page=${page - 1}&size=${pageSize}`, u);
+  const getUsers = async () => {
+    const res = await axios.get(`/user?search=${search}&page=${page - 1}&size=${pageSize}`);
     setUsers(res.data);
   };
 
@@ -90,10 +95,11 @@ function AdminUsersPage() {
   return (
     <Container>
       <h2>Admin users list</h2>
-      <EditUser modalData={modal} open={!!modal} handleClose={() => setModal(null)} />
+      <EditUser onSubmit={getUsers} modalData={modal} open={!!modal} handleClose={() => setModal(null)} />
       <VaccineModal modalData={vaccineModal} open={!!vaccineModal} handleClose={() => setVaccineModal(null)} />
       <CriminalProceedingModal modalData={criminal} open={!!criminal} handleClose={() => setCriminal(null)} />
-      <NewUserModal open={newUserModal} handleClose={() => setNewUserModal(false)} />
+      <NewUserModal onSubmit={getUsers} open={newUserModal} handleClose={() => setNewUserModal(false)} />
+      <IdCardModal modalData={cardIdModal} open={!!cardIdModal} handleClose={() => setCardIdModal(null)} />
       <Button onClick={() => setNewUserModal(true)}>Dodaj novog korisnika</Button>
 
       <Input onChange={setSearch} placeholder="Pretrazi korisnike" />

@@ -1,22 +1,29 @@
 import { Router } from "express";
 import { appDataSource } from "../dataSource";
 import { CriminalProceeding } from "../entity/CriminalProceeding";
-import { User } from "../entity/User";
+import isAdminMiddleware from "../middleware/adminMiddleware";
 
 const router = Router();
 
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
+  const where = {} as any
+  if (!(req.session as any).user.admin) {
+    where.userId = (req.session as any).user.id;
+  }
   res.json(
     await appDataSource.getRepository(CriminalProceeding).find({
       relations: {
         user: true,
       },
+      where,
       order: {
         id: "DESC",
       },
     })
   );
 });
+
+router.use(isAdminMiddleware);
 
 router.patch("/:id", async (req, res) => {
   const id = Number(req.params.id);
@@ -32,10 +39,10 @@ router.patch("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   let payload = req.body;
   delete payload.id;
-  const post = await appDataSource.getRepository(CriminalProceeding).save({
+  const proceeding = await appDataSource.getRepository(CriminalProceeding).save({
     ...payload,
   });
-  res.json(post);
+  res.json(proceeding);
 });
 
 router.delete("/:id", async (req, res) => {

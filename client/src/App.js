@@ -49,7 +49,7 @@ function App() {
   }
   if (!user) {
     return (
-      <Container>
+      <Container >
         <FlexboxGrid className='pt' justify='space-around'>
           <FlexboxGrid.Item colspan={8}>
             <BrowserRouter>

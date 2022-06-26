@@ -53,6 +53,30 @@ const vaccineColumns = [
   },
 ];
 
+const idCardColumns = [
+  {
+    fixed: "true",
+    header: "ID",
+    render: (e) => e.id,
+  },
+  {
+    header: "Datum izdavanja",
+    render: (e) => e.duration,
+  },
+  {
+    header: "Trajanje",
+    render: (e) => e.dateOfIssue,
+  },
+  {
+    header: "Mesto izdavanja",
+    render: (e) => e.placeIfIssue,
+  },
+  {
+    header: "Prebivaliste",
+    render: (e) => `${e.address}, ${e.city}`,
+  },
+]
+
 function UserPage() {
   const criminalProceedingActions = [
     {
@@ -78,6 +102,13 @@ function UserPage() {
     },
   ];
 
+  const idCardActions = [
+    {
+      render: () => "Izbrisi licnu kartu",
+      onclick: (e) => deleteUserIdCard(e?.id),
+    },
+  ]
+
   const params = useParams();
 
   const [user, setUser] = useState(null);
@@ -90,11 +121,18 @@ function UserPage() {
 
   const deleteVaccine = async (vaccineId) => {
     await axios.delete("vaccines/" + vaccineId);
+    getUserData().then((res) => setUser(res?.data));
   };
 
   const deleteCriminalRegister = async (vaccineId) => {
     await axios.delete("criminalProceeding/" + vaccineId);
+    getUserData().then((res) => setUser(res?.data));
   };
+
+  const deleteUserIdCard = async idCardId => {
+    await axios.delete('id-card/' + idCardId);
+    getUserData().then((res) => setUser(res?.data));
+  }
 
   useEffect(() => {
     getUserData().then((res) => setUser(res?.data));
@@ -105,11 +143,15 @@ function UserPage() {
       <CriminalProceedingModal
         modalData={criminalModal}
         open={!!criminalModal}
+        shouldUpdate
+        onSubmit={async () => {
+          const res = await getUserData();
+          setUser(res?.data)
+        }}
         handleClose={() => setCriminalModal(null)}
       />
       <Panel header="Info o korisniku" collapsible bordered shaded defaultExpanded>
         <div>Ime: {user?.firstName}</div>
-        <div>Prezime: {user?.lastName}</div>
         <div>Prezime: {user?.lastName}</div>
         <div>Email: {user?.email}</div>
         <div>JMBG: {user?.jmbg}</div>
@@ -117,7 +159,7 @@ function UserPage() {
       <Divider />
       <Panel header="Info o vakcinama" collapsible bordered shaded>
         <Content>
-          <TableWrap onRowClick={(e) => {}} actions={vaccinesActions} data={user?.vaccines} columns={vaccineColumns} />
+          <TableWrap onRowClick={(e) => { }} actions={vaccinesActions} data={user?.vaccines} columns={vaccineColumns} />
         </Content>
       </Panel>
       <Divider />
@@ -125,7 +167,7 @@ function UserPage() {
       <Panel header="Info o kriminalnom rekordu" collapsible bordered shaded>
         <Content>
           <TableWrap
-            onRowClick={(e) => {}}
+            onRowClick={(e) => { }}
             actions={criminalProceedingActions}
             data={user?.criminalProceedings}
             columns={criminalProceedingColumns}
@@ -137,7 +179,9 @@ function UserPage() {
 
       <Panel header="Info o licnim kartama" collapsible bordered shaded>
         <Content>
-          <TableWrap onRowClick={(e) => {}} actions={vaccinesActions} data={user?.vaccines} columns={vaccineColumns} />
+          <TableWrap
+            actions={idCardActions}
+            onRowClick={(e) => { }} data={user?.idCards} columns={idCardColumns} />
         </Content>
       </Panel>
       <Divider />

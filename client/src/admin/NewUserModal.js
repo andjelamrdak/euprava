@@ -4,7 +4,7 @@ import { Checkbox } from "rsuite";
 import Register from "../auth/Register";
 import ModalWrap from "../commons/ModalWrap";
 
-function NewUserModal({open, handleClose}) {
+function NewUserModal({ open, handleClose, onSubmit }) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   const createNewUser = async (user) => {
@@ -16,12 +16,13 @@ function NewUserModal({open, handleClose}) {
       <Checkbox value={isAdmin} onChange={setIsAdmin} />
       <h5>Da li je admin?</h5>
       <Register
-        onSubmit={async(e) => {
-            await createNewUser({ ...e, admin: isAdmin })
-            handleClose();
+        onSubmit={async (e) => {
+          await createNewUser({ ...e, admin: isAdmin })
+          onSubmit();
+          handleClose();
         }}
-        />
-        </ModalWrap>
+      />
+    </ModalWrap>
   );
 }
 
